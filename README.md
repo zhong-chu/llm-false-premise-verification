@@ -98,7 +98,7 @@ python -m src.summarize_kgfpq_comparison --primary-direct runs/kgfpq_direct_360.
 
 ## Early exploration
 
-The repository preserves a small, clearly separated record of the author’s earlier GAOKAO-Bench work. It is not included in the final ranking because its model versions, prompts, data cleaning, and parsing rules were not frozen. See [archive/gaokao_exploration](archive/gaokao_exploration/README.md). Full exam questions and answer keys are intentionally not redistributed.
+The repository preserves a small, clearly separated record of the author’s earlier GAOKAO-Bench, FactBench, annotation, and retrieval explorations. They are not included in the final ranking because their model versions, prompts, data cleaning, and parsing rules were not frozen. See [archive/gaokao_exploration](archive/gaokao_exploration/README.md) and [archive/early_exploration_code](archive/early_exploration_code/README.md). Full exam questions and answer keys are intentionally not redistributed.
 
 ## References
 

@@ -6,7 +6,7 @@
 
 ## 代码在哪里？
 
-所有可运行的代码都在 [`src/`](src/)：
+最终论文对应、可复现的代码都在 [`src/`](src/)（现在只保留 11 个核心脚本）：
 
 - `evaluate_kgfpq.py`：直接回答基线；
 - `run_premise_aware_from_direct.py`：PASEV 方法；
@@ -14,7 +14,7 @@
 - `prepare_kgfpq_yn.py`：构造不重叠的测试划分；
 - `summarize_kgfpq_comparison.py`：由逐题日志生成结果表。
 
-根目录的英文 README 是面向研究者和老师的正式入口，包含环境配置、复现实验命令与主要结果；这里保留中文导航，方便阅读。
+前期 FactBench、GAOKAO、标注和检索尝试的脚本已移至 [`archive/early_exploration_code/`](archive/early_exploration_code/)，不与最终结果混在一起。根目录的英文 README 是面向研究者和老师的正式入口，包含环境配置、复现实验命令与主要结果；这里保留中文导航，方便阅读。
 
 ## 研究结论的边界
 

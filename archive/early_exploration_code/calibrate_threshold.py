@@ -5,7 +5,7 @@ import argparse
 import json
 from pathlib import Path
 
-from src.risk_features import extract_risk_features
+from risk_features import extract_risk_features
 
 
 def main() -> None:
