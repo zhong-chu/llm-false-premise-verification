@@ -1,1 +1,2 @@
-# 本仓库仅使用 Python 标准库；保留该文件便于后续扩展依赖。
+# This repository currently uses only the Python standard library.
+# The file is retained to make future dependencies explicit and reproducible.

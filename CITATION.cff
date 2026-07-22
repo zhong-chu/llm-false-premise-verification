@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this code, data split, or result tables, please cite this repository."
+title: "Premise-Aware Selective Evidence Verification"
+type: software
+authors:
+  - name: "zhong-chu"
+version: 0.1.0
+date-released: 2026-07-22
+repository-code: "https://github.com/zhong-chu/llm-false-premise-verification"
+license: MIT

@@ -1,6 +1,6 @@
 # Premise-Aware Selective Evidence Verification
 
-[中文说明](README_zh.md) · [Experiment design](docs/experiment_design.md) · [Primary results](results/kgfpq_results.md) · [TPQ/FPQ boundary evaluation](results/kgfpq_mixed_results.md)
+[中文说明](README_zh.md) · [Experiment design](docs/experiment_design.md) · [Primary results](results/kgfpq_results.md) · [TPQ/FPQ boundary evaluation](results/kgfpq_mixed_results.md) · [Citation](CITATION.cff)
 
 This repository contains the code, frozen data splits, and aggregate results for an individual study of false-premise-induced factual errors in `deepseek-v4-flash`. The study uses the Yes/No portion of [KG-FPQ](https://aclanthology.org/2025.coling-main.698/) and compares direct answering, self-verification, full evidence verification, and a lightweight post-hoc routing policy.
 
@@ -40,6 +40,7 @@ docs/       Final experimental protocol and scope
 results/    Public aggregate tables generated from private JSONL logs
 archive/    Clearly separated early-semester exploratory work
 configs/    Safe configuration template; no credentials
+tests/      Offline checks for the frozen public data splits
 ```
 
 The main code entry points are:
@@ -62,6 +63,14 @@ $env:DEEPSEEK_API_KEY="YOUR_API_KEY"
 ```
 
 Do not commit `configs/config.json`, API keys, or raw JSONL model outputs. They are excluded by `.gitignore`.
+
+## Validate the public splits
+
+The following offline check verifies sample counts, domain/level balance, and the absence of source-record overlap between the primary and replication FPQ splits:
+
+```powershell
+python -m unittest discover -s tests -v
+```
 
 ## Reproduce the main experiments
 
@@ -104,3 +113,7 @@ The repository preserves a small, clearly separated record of the author’s ear
 
 - Zhu, Y., Xiao, J., Wang, Y., & Sang, J. (2025). *KG-FPQ: Evaluating Factuality Hallucination in LLMs with Knowledge Graph-based False Premise Questions*. COLING 2025.
 - Dhuliawala, S., Komeili, M., Xu, J., et al. (2024). *Chain-of-Verification Reduces Hallucination in Large Language Models*. Findings of ACL 2024.
+
+## License
+
+The code is released under the [MIT License](LICENSE). Please cite this repository using [CITATION.cff](CITATION.cff) if you build on the released implementation or frozen splits.
