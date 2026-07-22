@@ -1,2 +1,0 @@
-# This repository currently uses only the Python standard library.
-# The file is retained to make future dependencies explicit and reproducible.

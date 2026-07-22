@@ -55,7 +55,6 @@ configs/    安全的配置模板，不含密钥
 ```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
-pip install -r requirements.txt
 Copy-Item configs\config.example.json configs\config.json
 $env:DEEPSEEK_API_KEY="YOUR_API_KEY"
 ```
@@ -99,7 +98,3 @@ python -m src.summarize_kgfpq_comparison --primary-direct runs/kgfpq_direct_360.
 
 - Zhu, Y., Xiao, J., Wang, Y., & Sang, J. (2025). *KG-FPQ: Evaluating Factuality Hallucination in LLMs with Knowledge Graph-based False Premise Questions*. COLING 2025.
 - Dhuliawala, S., Komeili, M., Xu, J., et al. (2024). *Chain-of-Verification Reduces Hallucination in Large Language Models*. Findings of ACL 2024.
-
-## 许可证
-
-代码以 [MIT License](LICENSE) 发布。
