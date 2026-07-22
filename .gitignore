@@ -4,5 +4,10 @@ configs/config.json
 runs/
 data/kgfpq/raw/
 docx_work/
+annotations/
+assets/
+data/factbench/
+data/sample/
+data/smoke/
 *.pyc
 .env

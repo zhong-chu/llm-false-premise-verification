@@ -1,6 +1,6 @@
 # 假前提感知的选择性证据验证
 
-本仓库对应个人研究报告《大语言模型事实性错误评测与选择性验证缓解方法研究》。项目使用 DeepSeek V4 Flash 的黑盒 API，研究模型在 **KG-FPQ YN 假前提是非问答** 中是否会顺从错误前提，并实现一种只对高风险肯定回答调用外部证据的缓解方法。
+本仓库对应个人研究报告《大语言模型事实性错误评测与选择性验证缓解方法研究》。项目使用 DeepSeek V4 Flash 的黑盒 API，研究模型在 **KG-FPQ YN 假前提是非问答** 中是否会顺从错误前提，并比较自验证、全量证据验证与后验选择性证据验证的准确率—成本权衡。
 
 ## 核心方法
 
@@ -11,11 +11,11 @@
 3. 若 Direct 回答为 `YES` 或无法解析，提供该题已知的真实知识图谱三元组并再次验证；
 4. 输出验证后的答案。
 
-该门控规则的含义是：在假前提问答中，`YES` 会认可题目所断言的外部实体关系，因而应优先核验。它仅针对本任务场景，不应被表述为对所有开放式幻觉都有效的通用方案。
+该门控规则的含义是：在假前提问答中，`YES` 会认可题目所断言的外部实体关系，因而应优先核验。它仅针对本任务场景，不应被表述为对所有开放式幻觉都有效的通用方案，也不主张首创选择性验证或假前提检索验证。
 
 ## 主要结果
 
-完整、可重新生成的汇总表见 [results/kgfpq_results.md](results/kgfpq_results.md)。
+完整、可重新生成的汇总表见 [results/kgfpq_results.md](results/kgfpq_results.md)，最终实验设计见 [docs/experiment_design.md](docs/experiment_design.md)。
 
 真假前提混合验证见 [results/kgfpq_mixed_results.md](results/kgfpq_mixed_results.md)。该验证表明 PASEV 仅能修正“假前提被错误肯定”，不能修正真实命题被错误否定，因此其适用范围必须限定为 FPQ 场景。
 
@@ -37,6 +37,10 @@
 早期的 **ConSC-Verify v1（Claim-Sensitive Calibrated Verification）** 使用一次额外的大模型调用，按回答中的日期、实体、数值等“事实断言表面”评分并选择是否验证。它在短关系型 KG-FPQ 问题上迁移失败：仅验证 2/360 题、准确率 96.39%，且平均 token/题为 220.62，高于全量证据验证。该消融结果被保留，避免选择性报告。
 
 另实现了 CoVe-style 自验证基线：对原关系进行独立核验，再用初答与核验结果生成最终答案。它修正了 12 个 Direct 错误，却引入 102 个新错误，最终准确率为 70.83%。这说明在该任务中，不带外部证据的多轮自验证会放大不稳定性，不能替代可追溯证据验证。
+
+## 早期探索工作
+
+GAOKAO-Bench 早期探索的范围、保留原因和不纳入最终排名的原因见 [archive/gaokao_exploration/README.md](archive/gaokao_exploration/README.md)。完整试题和答案不随仓库分发。
 
 ## 环境配置
 
@@ -69,7 +73,15 @@ python -m src.run_premise_aware_from_direct --config configs/config.json --input
 
 如网络中断，在第二条命令末尾加入 `--resume`。独立复现时，将两处文件名替换为 `replication_360` 即可。
 
-### 3. 生成汇总表
+### 3. 真假前提混合边界测试
+
+```powershell
+python -m src.prepare_kgfpq_mixed --false-input data/kgfpq/replication_360.jsonl --raw-dir data/kgfpq/raw --out data/kgfpq/replication_mixed_720.jsonl --seed 20260822
+python -m src.evaluate_kgfpq --config configs/config.json --input data/kgfpq/replication_mixed_720.jsonl --out runs/kgfpq_mixed_direct_720.jsonl --method direct
+python -m src.run_premise_aware_from_direct --config configs/config.json --input runs/kgfpq_mixed_direct_720.jsonl --out runs/kgfpq_mixed_premise_aware_720.jsonl
+```
+
+### 4. 生成汇总表
 
 ```powershell
 python -m src.summarize_kgfpq_comparison --primary-direct runs/kgfpq_direct_360.jsonl --primary-full runs/kgfpq_full_evidence_360.jsonl --primary-cove runs/kgfpq_cove_360.jsonl --primary-consc-v1 runs/kgfpq_consc_selective_360.jsonl --primary-pav runs/kgfpq_premise_aware_360.jsonl --replication-direct runs/kgfpq_replication_direct_360.jsonl --replication-pav runs/kgfpq_replication_premise_aware_360.jsonl --json-out results/kgfpq_results.json --markdown-out results/kgfpq_results.md
