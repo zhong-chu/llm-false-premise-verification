@@ -1,62 +1,71 @@
-# 假前提感知的选择性证据验证
+# Premise-Aware Selective Evidence Verification
 
-本仓库对应个人研究报告《大语言模型事实性错误评测与选择性验证缓解方法研究》。项目使用 DeepSeek V4 Flash 的黑盒 API，研究模型在 **KG-FPQ YN 假前提是非问答** 中是否会顺从错误前提，并比较自验证、全量证据验证与后验选择性证据验证的准确率—成本权衡。
+[中文说明](README_zh.md) · [Experiment design](docs/experiment_design.md) · [Primary results](results/kgfpq_results.md) · [TPQ/FPQ boundary evaluation](results/kgfpq_mixed_results.md)
 
-## 核心方法
+This repository contains the code, frozen data splits, and aggregate results for an individual study of false-premise-induced factual errors in `deepseek-v4-flash`. The study uses the Yes/No portion of [KG-FPQ](https://aclanthology.org/2025.coling-main.698/) and compares direct answering, self-verification, full evidence verification, and a lightweight post-hoc routing policy.
 
-**Premise-Aware Selective Evidence Verification（PASEV）** 的流程如下：
+## Method
 
-1. 对问题进行 Direct 回答（仅 `YES` / `NO`）；
-2. 若 Direct 回答为 `NO`，保留该回答；
-3. 若 Direct 回答为 `YES` 或无法解析，提供该题已知的真实知识图谱三元组并再次验证；
-4. 输出验证后的答案。
+**Premise-Aware Selective Evidence Verification (PASEV)** proceeds as follows:
 
-该门控规则的含义是：在假前提问答中，`YES` 会认可题目所断言的外部实体关系，因而应优先核验。它仅针对本任务场景，不应被表述为对所有开放式幻觉都有效的通用方案，也不主张首创选择性验证或假前提检索验证。
+1. Answer the original question once (`YES` or `NO`).
+2. Keep a clear `NO` answer.
+3. For a `YES` or unparseable answer, add the item’s trusted knowledge-graph triple and answer again.
 
-## 主要结果
+In a false-premise question, an affirmative answer accepts the asserted external relation. PASEV therefore routes only affirmative answers to evidence verification.
 
-完整、可重新生成的汇总表见 [results/kgfpq_results.md](results/kgfpq_results.md)，最终实验设计见 [docs/experiment_design.md](docs/experiment_design.md)。
+> **Scope.** PASEV is a post-hoc policy for false-premise-induced false affirmations in KG-FPQ-style binary questions. It is not presented as a general solution to open-ended hallucination, nor as the first work on selective verification or premise verification.
 
-真假前提混合验证见 [results/kgfpq_mixed_results.md](results/kgfpq_mixed_results.md)。该验证表明 PASEV 仅能修正“假前提被错误肯定”，不能修正真实命题被错误否定，因此其适用范围必须限定为 FPQ 场景。
+## Main results
 
-| 划分 | 方法 | 正确率 | 证据验证率 | 平均 token/题 |
+| Split | Method | Accuracy | Evidence verification rate | Mean tokens / item |
 |---|---|---:|---:|---:|
-| 探索集（360 题） | Direct | 95.83% | 0.00% | 39.60 |
-| 探索集（360 题） | 全量证据验证 | 99.44% | 100.00% | 103.88 |
-| 探索集（360 题） | CoVe-style 自验证 | 70.83% | 100.00% | 168.81 |
-| 探索集（360 题） | PASEV | 100.00% | 4.17% | 42.37 |
-| 独立复现集（360 题） | Direct | 95.00% | 0.00% | 39.54 |
-| 独立复现集（360 题） | PASEV | 100.00% | 5.00% | 42.78 |
+| Primary FPQ (360) | Direct | 95.83% | 0.00% | 39.60 |
+| Primary FPQ (360) | Full evidence verification | 99.44% | 100.00% | 103.88 |
+| Primary FPQ (360) | CoVe-style self-verification | 70.83% | 100.00% | 168.81 |
+| Primary FPQ (360) | PASEV | 100.00% | 4.17% | 42.37 |
+| Independent FPQ replication (360) | Direct | 95.00% | 0.00% | 39.54 |
+| Independent FPQ replication (360) | PASEV | 100.00% | 5.00% | 42.78 |
 
-在官方 TPQ/FPQ 配对的 720 题混合集中，Direct 为 82.08%，PASEV 为 84.58%。增益全部来自 FPQ 子集（95.00% 至 100.00%）；TPQ 子集均为 69.17%。
+The official paired TPQ/FPQ evaluation prevents an overly broad interpretation: Direct and PASEV achieve 69.17% on true-premise questions, while PASEV improves false-premise accuracy from 95.00% to 100.00%. See [the full boundary evaluation](results/kgfpq_mixed_results.md).
 
-独立复现集采用种子 `20260821`，并排除了探索集使用过的全部源知识图谱记录。PASEV 的规则在探索结果出现后固定，未在复现集上继续调整。
+The repository also retains two negative results: a claim-surface routing ablation (ConSC-Verify v1) transferred poorly to short relational questions, and the CoVe-style self-verification baseline introduced many new errors. They are reported to avoid selective reporting.
 
-## 重要负结果
+## Repository layout
 
-早期的 **ConSC-Verify v1（Claim-Sensitive Calibrated Verification）** 使用一次额外的大模型调用，按回答中的日期、实体、数值等“事实断言表面”评分并选择是否验证。它在短关系型 KG-FPQ 问题上迁移失败：仅验证 2/360 题、准确率 96.39%，且平均 token/题为 220.62，高于全量证据验证。该消融结果被保留，避免选择性报告。
+```text
+src/        Experiment code and command-line entry points
+data/kgfpq/ Frozen KG-FPQ splits used in this study
+docs/       Final experimental protocol and scope
+results/    Public aggregate tables generated from private JSONL logs
+archive/    Clearly separated early-semester exploratory work
+configs/    Safe configuration template; no credentials
+```
 
-另实现了 CoVe-style 自验证基线：对原关系进行独立核验，再用初答与核验结果生成最终答案。它修正了 12 个 Direct 错误，却引入 102 个新错误，最终准确率为 70.83%。这说明在该任务中，不带外部证据的多轮自验证会放大不稳定性，不能替代可追溯证据验证。
+The main code entry points are:
 
-## 早期探索工作
+- `src/fetch_kgfpq.py`: download the original KG-FPQ JSON files;
+- `src/prepare_kgfpq_yn.py`: construct disjoint FPQ splits;
+- `src/evaluate_kgfpq.py`: run Direct evaluation;
+- `src/run_premise_aware_from_direct.py`: run PASEV from Direct outputs;
+- `src/run_cove_kgfpq_from_direct.py`: run the CoVe-style baseline;
+- `src/summarize_kgfpq_comparison.py`: generate the public result table.
 
-GAOKAO-Bench 早期探索的范围、保留原因和不纳入最终排名的原因见 [archive/gaokao_exploration/README.md](archive/gaokao_exploration/README.md)。完整试题和答案不随仓库分发。
-
-## 环境配置
+## Setup
 
 ```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 Copy-Item configs\config.example.json configs\config.json
-$env:DEEPSEEK_API_KEY="你的密钥"
+$env:DEEPSEEK_API_KEY="YOUR_API_KEY"
 ```
 
-`configs/config.json` 和 API 密钥均不应提交到 GitHub。
+Do not commit `configs/config.json`, API keys, or raw JSONL model outputs. They are excluded by `.gitignore`.
 
-## 复现实验
+## Reproduce the main experiments
 
-### 1. 下载并构建 KG-FPQ 划分
+### 1. Download KG-FPQ and create disjoint FPQ splits
 
 ```powershell
 python -m src.fetch_kgfpq --out-dir data/kgfpq/raw
@@ -64,16 +73,16 @@ python -m src.prepare_kgfpq_yn --raw-dir data/kgfpq/raw --out data/kgfpq/test_36
 python -m src.prepare_kgfpq_yn --raw-dir data/kgfpq/raw --out data/kgfpq/replication_360.jsonl --per-stratum 20 --seed 20260821 --exclude data/kgfpq/test_360.jsonl
 ```
 
-### 2. Direct 与 PASEV
+### 2. Direct and PASEV evaluation
 
 ```powershell
 python -m src.evaluate_kgfpq --config configs/config.json --input data/kgfpq/test_360.jsonl --out runs/kgfpq_direct_360.jsonl --method direct
 python -m src.run_premise_aware_from_direct --config configs/config.json --input runs/kgfpq_direct_360.jsonl --out runs/kgfpq_premise_aware_360.jsonl
 ```
 
-如网络中断，在第二条命令末尾加入 `--resume`。独立复现时，将两处文件名替换为 `replication_360` 即可。
+Append `--resume` to resume an interrupted run. For the independent replication, replace both occurrences of `test_360` with `replication_360`.
 
-### 3. 真假前提混合边界测试
+### 3. TPQ/FPQ paired boundary evaluation
 
 ```powershell
 python -m src.prepare_kgfpq_mixed --false-input data/kgfpq/replication_360.jsonl --raw-dir data/kgfpq/raw --out data/kgfpq/replication_mixed_720.jsonl --seed 20260822
@@ -81,21 +90,17 @@ python -m src.evaluate_kgfpq --config configs/config.json --input data/kgfpq/rep
 python -m src.run_premise_aware_from_direct --config configs/config.json --input runs/kgfpq_mixed_direct_720.jsonl --out runs/kgfpq_mixed_premise_aware_720.jsonl
 ```
 
-### 4. 生成汇总表
+### 4. Regenerate the primary result table
 
 ```powershell
 python -m src.summarize_kgfpq_comparison --primary-direct runs/kgfpq_direct_360.jsonl --primary-full runs/kgfpq_full_evidence_360.jsonl --primary-cove runs/kgfpq_cove_360.jsonl --primary-consc-v1 runs/kgfpq_consc_selective_360.jsonl --primary-pav runs/kgfpq_premise_aware_360.jsonl --replication-direct runs/kgfpq_replication_direct_360.jsonl --replication-pav runs/kgfpq_replication_premise_aware_360.jsonl --json-out results/kgfpq_results.json --markdown-out results/kgfpq_results.md
 ```
 
-## 目录说明
+## Early exploration
 
-- `src/`：数据构建、模型调用、选择性验证与汇总代码；
-- `data/kgfpq/`：冻结的实验划分；原始数据可按上述命令下载；
-- `runs/`：逐题运行日志（默认不提交，可能含 API 响应）；
-- `results/`：由逐题日志生成、可公开的汇总结果；
-- `docs/`：实验方案和研究记录。
+The repository preserves a small, clearly separated record of the author’s earlier GAOKAO-Bench work. It is not included in the final ranking because its model versions, prompts, data cleaning, and parsing rules were not frozen. See [archive/gaokao_exploration](archive/gaokao_exploration/README.md). Full exam questions and answer keys are intentionally not redistributed.
 
-## 引用
+## References
 
-- Zhu Y, Xiao J, Wang Y, Sang J. *KG-FPQ: Evaluating Factuality Hallucination in LLMs with Knowledge Graph-based False Premise Questions*. COLING, 2025.
-- Dhuliawala S, Komeili M, Xu J, et al. *Chain-of-Verification Reduces Hallucination in Large Language Models*. Findings of ACL, 2024.
+- Zhu, Y., Xiao, J., Wang, Y., & Sang, J. (2025). *KG-FPQ: Evaluating Factuality Hallucination in LLMs with Knowledge Graph-based False Premise Questions*. COLING 2025.
+- Dhuliawala, S., Komeili, M., Xu, J., et al. (2024). *Chain-of-Verification Reduces Hallucination in Large Language Models*. Findings of ACL 2024.
