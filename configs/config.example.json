@@ -1,0 +1,12 @@
+{
+  "model": "deepseek-v4-flash",
+  "base_url": "https://api.deepseek.com",
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "temperature": 0,
+  "top_p": 1,
+  "max_tokens": 64,
+  "thinking": {"type": "disabled"},
+  "logprobs": true,
+  "top_logprobs": 5,
+  "system_prompt": "你是一名严谨的答题助手。仅输出最终选项字母，不要解释。"
+}

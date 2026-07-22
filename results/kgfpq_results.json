@@ -1,0 +1,125 @@
+{
+  "primary_exploratory": [
+    {
+      "method": "Direct",
+      "n": 360,
+      "correct": 345,
+      "accuracy": 0.9583333333333334,
+      "wilson_95_ci": [
+        0.9323984775590204,
+        0.9745896183596432
+      ],
+      "verified_n": 0,
+      "verification_rate": 0.0,
+      "calls": 360,
+      "total_tokens": 14255,
+      "mean_tokens_per_item": 39.59722222222222,
+      "mean_latency_s_per_item": 0.7609363888888888,
+      "source": "runs/kgfpq_direct_360.jsonl"
+    },
+    {
+      "method": "Full evidence verification",
+      "n": 360,
+      "correct": 358,
+      "accuracy": 0.9944444444444445,
+      "wilson_95_ci": [
+        0.9799725903182546,
+        0.9984751737636977
+      ],
+      "verified_n": 360,
+      "verification_rate": 1.0,
+      "calls": 720,
+      "total_tokens": 37398,
+      "mean_tokens_per_item": 103.88333333333334,
+      "mean_latency_s_per_item": 1.4946319444444445,
+      "source": "runs/kgfpq_full_evidence_360.jsonl"
+    },
+    {
+      "method": "CoVe-style self-verification",
+      "n": 360,
+      "correct": 255,
+      "accuracy": 0.7083333333333334,
+      "wilson_95_ci": [
+        0.6593770210469021,
+        0.7528902952797631
+      ],
+      "verified_n": 360,
+      "verification_rate": 1.0,
+      "calls": 1080,
+      "total_tokens": 60771,
+      "mean_tokens_per_item": 168.80833333333334,
+      "mean_latency_s_per_item": 2.1898647222222225,
+      "source": "runs/kgfpq_cove_360.jsonl"
+    },
+    {
+      "method": "ConSC-Verify v1 (failed ablation)",
+      "n": 360,
+      "correct": 347,
+      "accuracy": 0.9638888888888889,
+      "wilson_95_ci": [
+        0.9392046234258701,
+        0.978777267594838
+      ],
+      "verified_n": 2,
+      "verification_rate": 0.005555555555555556,
+      "calls": 722,
+      "total_tokens": 79422,
+      "mean_tokens_per_item": 220.61666666666667,
+      "mean_latency_s_per_item": 1.5471441666666668,
+      "source": "runs/kgfpq_consc_selective_360.jsonl"
+    },
+    {
+      "method": "Premise-aware selective verification (exploratory)",
+      "n": 360,
+      "correct": 360,
+      "accuracy": 1.0,
+      "wilson_95_ci": [
+        0.9894415591839967,
+        1.0
+      ],
+      "verified_n": 15,
+      "verification_rate": 0.041666666666666664,
+      "calls": 375,
+      "total_tokens": 15253,
+      "mean_tokens_per_item": 42.36944444444445,
+      "mean_latency_s_per_item": 0.7965130555555556,
+      "source": "runs/kgfpq_premise_aware_360.jsonl"
+    }
+  ],
+  "independent_replication": [
+    {
+      "method": "Direct",
+      "n": 360,
+      "correct": 342,
+      "accuracy": 0.95,
+      "wilson_95_ci": [
+        0.9223554542673779,
+        0.9681419489982189
+      ],
+      "verified_n": 0,
+      "verification_rate": 0.0,
+      "calls": 360,
+      "total_tokens": 14233,
+      "mean_tokens_per_item": 39.53611111111111,
+      "mean_latency_s_per_item": 0.7075163888888889,
+      "source": "runs/kgfpq_replication_direct_360.jsonl"
+    },
+    {
+      "method": "Premise-aware selective verification (independent replication)",
+      "n": 360,
+      "correct": 360,
+      "accuracy": 1.0,
+      "wilson_95_ci": [
+        0.9894415591839967,
+        1.0
+      ],
+      "verified_n": 18,
+      "verification_rate": 0.05,
+      "calls": 378,
+      "total_tokens": 15400,
+      "mean_tokens_per_item": 42.77777777777778,
+      "mean_latency_s_per_item": 0.7411244444444445,
+      "source": "runs/kgfpq_replication_premise_aware_360.jsonl"
+    }
+  ]
+}
