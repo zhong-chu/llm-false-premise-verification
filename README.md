@@ -1,6 +1,6 @@
 # 假前提感知的选择性证据验证
 
-[English README](README_EN.md) · [实验设计](docs/experiment_design.md) · [主实验结果](results/kgfpq_results.md) · [TPQ/FPQ 边界测试](results/kgfpq_mixed_results.md) · [引用信息](CITATION.cff)
+[English README](README_EN.md) · [实验设计](docs/experiment_design.md) · [主实验结果](results/kgfpq_results.md) · [TPQ/FPQ 边界测试](results/kgfpq_mixed_results.md)
 
 本仓库包含一项个人研究的代码、冻结数据划分与汇总结果。研究使用 `deepseek-v4-flash`，在 [KG-FPQ](https://aclanthology.org/2025.coling-main.698/) 的“是/否”假前提问题上比较直接回答、自验证、全量证据验证和轻量级后验选择性验证策略。
 
@@ -38,9 +38,7 @@ src/        实验代码与命令行入口
 data/kgfpq/ 本研究使用的冻结 KG-FPQ 划分
 docs/       最终实验方案与适用范围说明
 results/    由私有 JSONL 日志生成的公开汇总表
-archive/    与最终实验分离的学期早期探索
 configs/    安全的配置模板，不含密钥
-tests/      对冻结公开数据划分的离线检查
 ```
 
 主要代码入口如下：
@@ -63,14 +61,6 @@ $env:DEEPSEEK_API_KEY="YOUR_API_KEY"
 ```
 
 不要提交 `configs/config.json`、API 密钥或逐题原始 JSONL 模型输出；它们已被 `.gitignore` 排除。
-
-## 检查公开数据划分
-
-下述离线检查会验证样本数、领域/难度层级平衡，以及主 FPQ 集与复现 FPQ 集没有来源记录重叠：
-
-```powershell
-python -m unittest discover -s tests -v
-```
 
 ## 复现主要实验
 
@@ -105,10 +95,6 @@ python -m src.run_premise_aware_from_direct --config configs/config.json --input
 python -m src.summarize_kgfpq_comparison --primary-direct runs/kgfpq_direct_360.jsonl --primary-full runs/kgfpq_full_evidence_360.jsonl --primary-cove runs/kgfpq_cove_360.jsonl --primary-consc-v1 runs/kgfpq_consc_selective_360.jsonl --primary-pav runs/kgfpq_premise_aware_360.jsonl --replication-direct runs/kgfpq_replication_direct_360.jsonl --replication-pav runs/kgfpq_replication_premise_aware_360.jsonl --json-out results/kgfpq_results.json --markdown-out results/kgfpq_results.md
 ```
 
-## 早期探索
-
-仓库保留了作者早期的 GAOKAO-Bench、FactBench、人工标注和检索探索，并将其与最终实验清晰分开。由于当时的模型版本、提示词、数据清洗和解析规则没有全部冻结，它们不纳入最终排名。见 [archive/gaokao_exploration](archive/gaokao_exploration/README.md) 和 [archive/early_exploration_code](archive/early_exploration_code/README.md)。完整试题与答案不在本仓库分发。
-
 ## 参考文献
 
 - Zhu, Y., Xiao, J., Wang, Y., & Sang, J. (2025). *KG-FPQ: Evaluating Factuality Hallucination in LLMs with Knowledge Graph-based False Premise Questions*. COLING 2025.
@@ -116,4 +102,4 @@ python -m src.summarize_kgfpq_comparison --primary-direct runs/kgfpq_direct_360.
 
 ## 许可证
 
-代码以 [MIT License](LICENSE) 发布。如使用本仓库的实现或冻结划分，请按 [CITATION.cff](CITATION.cff) 中的信息引用。
+代码以 [MIT License](LICENSE) 发布。

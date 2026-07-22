@@ -1,6 +1,6 @@
 # Premise-Aware Selective Evidence Verification
 
-[中文说明](README.md) · [Experiment design](docs/experiment_design.md) · [Primary results](results/kgfpq_results.md) · [TPQ/FPQ boundary evaluation](results/kgfpq_mixed_results.md) · [Citation](CITATION.cff)
+[中文说明](README.md) · [Experiment design](docs/experiment_design.md) · [Primary results](results/kgfpq_results.md) · [TPQ/FPQ boundary evaluation](results/kgfpq_mixed_results.md)
 
 This repository contains the code, frozen data splits, and aggregate results for an individual study of false-premise-induced factual errors in `deepseek-v4-flash`. The study uses the Yes/No portion of [KG-FPQ](https://aclanthology.org/2025.coling-main.698/) and compares direct answering, self-verification, full evidence verification, and a lightweight post-hoc routing policy.
 
@@ -38,9 +38,7 @@ src/        Experiment code and command-line entry points
 data/kgfpq/ Frozen KG-FPQ splits used in this study
 docs/       Final experimental protocol and scope
 results/    Public aggregate tables generated from private JSONL logs
-archive/    Clearly separated early-semester exploratory work
 configs/    Safe configuration template; no credentials
-tests/      Offline checks for the frozen public data splits
 ```
 
 The main code entry points are:
@@ -63,14 +61,6 @@ $env:DEEPSEEK_API_KEY="YOUR_API_KEY"
 ```
 
 Do not commit `configs/config.json`, API keys, or raw JSONL model outputs. They are excluded by `.gitignore`.
-
-## Validate the public splits
-
-The following offline check verifies sample counts, domain/level balance, and the absence of source-record overlap between the primary and replication FPQ splits:
-
-```powershell
-python -m unittest discover -s tests -v
-```
 
 ## Reproduce the main experiments
 
@@ -105,10 +95,6 @@ python -m src.run_premise_aware_from_direct --config configs/config.json --input
 python -m src.summarize_kgfpq_comparison --primary-direct runs/kgfpq_direct_360.jsonl --primary-full runs/kgfpq_full_evidence_360.jsonl --primary-cove runs/kgfpq_cove_360.jsonl --primary-consc-v1 runs/kgfpq_consc_selective_360.jsonl --primary-pav runs/kgfpq_premise_aware_360.jsonl --replication-direct runs/kgfpq_replication_direct_360.jsonl --replication-pav runs/kgfpq_replication_premise_aware_360.jsonl --json-out results/kgfpq_results.json --markdown-out results/kgfpq_results.md
 ```
 
-## Early exploration
-
-The repository preserves a small, clearly separated record of the author’s earlier GAOKAO-Bench, FactBench, annotation, and retrieval explorations. They are not included in the final ranking because their model versions, prompts, data cleaning, and parsing rules were not frozen. See [archive/gaokao_exploration](archive/gaokao_exploration/README.md) and [archive/early_exploration_code](archive/early_exploration_code/README.md). Full exam questions and answer keys are intentionally not redistributed.
-
 ## References
 
 - Zhu, Y., Xiao, J., Wang, Y., & Sang, J. (2025). *KG-FPQ: Evaluating Factuality Hallucination in LLMs with Knowledge Graph-based False Premise Questions*. COLING 2025.
@@ -116,4 +102,4 @@ The repository preserves a small, clearly separated record of the author’s ear
 
 ## License
 
-The code is released under the [MIT License](LICENSE). Please cite this repository using [CITATION.cff](CITATION.cff) if you build on the released implementation or frozen splits.
+The code is released under the [MIT License](LICENSE).
